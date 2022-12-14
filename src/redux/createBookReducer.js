@@ -2,6 +2,7 @@ import { doc, setDoc, deleteDoc } from 'firebase/firestore';
 import { deleteObject, getDownloadURL, ref, uploadBytesResumable } from 'firebase/storage';
 import { db, storage } from '../firebase-config';
 import { v4 as uuidv4 } from 'uuid';
+import { serverTimestamp } from "firebase/firestore"
 
 const CREATE_BOOK_REQUEST = 'app/createBook/CREATE_BOOK_REQUEST';
 const CREATE_BOOK_SUCCESS = 'app/createBook/CREATE_BOOK_SUCCESS';
@@ -74,6 +75,8 @@ export const createBook =
     async dispatch => {
         dispatch(createBookRequest());
         if (id === 0) id = uuidv4();
+        book.id = id;
+        book.CreatedAt = serverTimestamp();
 
         let uploadingDone = false;
         try {
@@ -98,8 +101,6 @@ export const createBook =
                 }
                 uploadingDone = true;
             }
-            //console.log(book.BookCover);
-            //console.log(book.BookPDF);
             await setDoc(doc(db, 'books', id), book);
         } catch (e) {
             dispatch(createBookError(e));

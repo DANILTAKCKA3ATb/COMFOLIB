@@ -20,6 +20,7 @@ const CreateBookPage = props => {
 
     const handleSubmit = async values => {
         const book = {
+            id: '',
             BookName: values.BookName,
             AuthorName: values.AuthorName,
             Description: values.Description,
@@ -27,6 +28,7 @@ const CreateBookPage = props => {
             Topics: [...bookTopics],
             BookCover: '',
             BookPDF: '',
+            CreatedAt: null,
         };
         //console.log(book);
         try {

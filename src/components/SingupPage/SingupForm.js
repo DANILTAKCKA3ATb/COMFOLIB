@@ -27,27 +27,9 @@ const SignupForm = props => {
                             </Typography>
                         ) : null}
                         <Grid container spacing={2}>
-                            {/* <Grid item xs={12} sm={6}>
-                <FieldTextInput
-                  autoComplete="fname"
-                  name="firstName"
-                  variant="outlined"
-                  required
-                  id="firstName"
-                  label="First Name"
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <FieldTextInput
-                  variant="outlined"
-                  required
-                  fullWidth
-                  id="lastName"
-                  label="Last Name"
-                  name="lastName"
-                  autoComplete="lname"
-                />
-              </Grid> */}
+                            <Grid item xs={12} >
+                                <FieldTextInput autoComplete='name' name='Name' variant='outlined' required id='Name' label='Name' />
+                            </Grid>
                             <Grid item xs={12}>
                                 <FieldTextInput variant='outlined' required type='email' id='email' label='Email Address' name='email' autoComplete='email' />
                             </Grid>

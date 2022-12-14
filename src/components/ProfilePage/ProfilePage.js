@@ -14,7 +14,7 @@ const ProfilePage = (props) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!isAuthenticated) navigate("/login");
+    //if (!isAuthenticated) navigate("/login");
   });
 
   React.useEffect(() => {

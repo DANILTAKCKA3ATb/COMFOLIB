@@ -6,6 +6,9 @@ import { db } from './../firebase-config';
 
 export const AUTH_INFO_SUCCESS = 'app/auth/AUTH_INFO_SUCCESS';
 
+export const GET_IS_ADMIN_REQUEST = 'app/auth/GET_IS_ADMIN_REQUEST';
+export const GET_IS_ADMIN_SUCCESS = 'app/auth/GET_IS_ADMIN_SUCCESS';
+export const GET_IS_ADMIN_ERROR = 'app/auth/GET_IS_ADMIN_ERROR';
 export const SET_ADMIN = 'app/auth/SET_ADMIN';
 
 export const LOGIN_REQUEST = 'app/auth/LOGIN_REQUEST';
@@ -23,6 +26,8 @@ export const LOGOUT_ERROR = 'app/auth/LOGOUT_ERROR';
 const initialState = {
     isAuthenticated: false,
 
+    getIsAdminProgress: false,
+    getIsAdminError: null,
     isAdmin: false,
 
     loginInProgress: false,
@@ -39,16 +44,16 @@ export default function authReducer(state = initialState, action = {}) {
     const { type, payload } = action;
     switch (type) {
         case AUTH_INFO_SUCCESS:
-            return {
-                ...state,
-                isAuthenticated: !!payload,
-            };
+            return { ...state, isAuthenticated: !!payload };
 
+        case GET_IS_ADMIN_REQUEST:
+            return { ...state, getIsAdminProgress: true, getIsAdminError: null };
+        case GET_IS_ADMIN_SUCCESS:
+            return { ...state, getIsAdminProgress: false };
+        case GET_IS_ADMIN_ERROR:
+            return { ...state, getIsAdminProgress: false, getIsAdminError: payload };
         case SET_ADMIN:
-            return {
-                ...state,
-                isAdmin: !!payload,
-            };
+            return { ...state, isAdmin: true, library: payload };
 
         case LOGIN_REQUEST:
             return { ...state, loginInProgress: true, loginError: null };
@@ -75,11 +80,11 @@ export default function authReducer(state = initialState, action = {}) {
     }
 }
 
-export const authInfoSuccess = user => ({
-    type: AUTH_INFO_SUCCESS,
-    payload: user,
-});
+export const authInfoSuccess = user => ({ type: AUTH_INFO_SUCCESS, payload: user });
 
+export const getIsAdminRequest = () => ({ type: GET_IS_ADMIN_REQUEST });
+export const getIsAdminSuccess = () => ({ type: GET_IS_ADMIN_SUCCESS });
+export const getIsAdminError = e => ({ type: GET_IS_ADMIN_ERROR, payload: e });
 export const setAdmin = e => ({ type: SET_ADMIN, payload: e });
 
 export const loginRequest = () => ({ type: LOGIN_REQUEST });
@@ -94,6 +99,21 @@ export const logoutRequest = () => ({ type: LOGOUT_REQUEST });
 export const logoutSuccess = () => ({ type: LOGOUT_SUCCESS });
 export const logoutError = e => ({ type: LOGOUT_ERROR, payload: e });
 
+export const getAdmin = uid => async dispatch => {
+    dispatch(getIsAdminRequest());
+    const docRef = doc(db, 'admins', uid);
+    try {
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            dispatch(setAdmin(docSnap.data().library));
+        }
+    } catch (e) {
+        dispatch(getIsAdminError(e));
+        return;
+    }
+    dispatch(getIsAdminSuccess());
+};
+
 export const login = (email, password) => async dispatch => {
     dispatch(loginRequest());
     try {
@@ -106,31 +126,12 @@ export const login = (email, password) => async dispatch => {
     dispatch(loginSuccess());
 };
 
-export const getAdmin = uid => async dispatch => {
-    const docRef = doc(db, 'users', uid);
-    try {
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-            dispatch(setAdmin(docSnap.data().isAdmin));
-        }
-    } catch (e) {
-        dispatch(loginError(e));
-        throw e;
-    }
-};
-
 export const signup = params => async dispatch => {
-    const { email, password } = params;
+    const { email, password, Name } = params;
     dispatch(signupRequest());
-
     try {
         const data = await createUserWithEmailAndPassword(auth, email, password);
-        try {
-            setDoc(doc(db, 'users', data.user.uid), { isAdmin: false });
-        } catch (e) {
-            console.error('Error: ', e);
-            return;
-        }
+        await setDoc(doc(db, 'users', data.user.uid), { Name: Name, Email: email });
     } catch (e) {
         dispatch(signupError(e));
         return;

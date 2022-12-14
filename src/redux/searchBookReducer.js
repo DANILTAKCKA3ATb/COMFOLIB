@@ -14,17 +14,24 @@ const GET_VIEW_BOOK_SUCCESS = 'app/searchBook/GET_VIEW_BOOK_SUCCESS';
 const GET_VIEW_BOOK_ERROR = 'app/searchBook/GET_VIEW_BOOK_ERROR';
 const SET_VIEW_BOOK = 'app/searchBook/SET_VIEW_BOOK';
 
+const SET_SEARCH_TEXT = 'app/searchBook/SET_SEARCH_TEXT';
+const SET_SEARCH_TOPIC = 'app/searchBook/SET_SEARCH_TOPIC';
+
 const initialState = {
     searchBookInProgress: false,
     searchBookError: null,
 
-    allTopics: ['0', '1', '2'],
+    searchText: '',
+    searchTopic: '',
+
+    allTopics: ['0'],
 
     books: [],
 
     getViewBookInProgress: false,
     getViewBookError: null,
     viewBook: {
+        id: '',
         BookName: '',
         AuthorName: '',
         Description: '',
@@ -44,6 +51,11 @@ export default function searchBookReducer(state = initialState, action = {}) {
             return { ...state, searchBookInProgress: false };
         case SEARCH_BOOK_ERROR:
             return { ...state, searchBookInProgress: false, searchBookError: payload };
+
+        case SET_SEARCH_TEXT:
+            return {...state, searchText: payload };
+        case SET_SEARCH_TOPIC:
+                return {...state, searchTopic: payload };
 
         case SET_ALL_TOPICS:
             return { ...state, allTopics: payload };
@@ -69,6 +81,9 @@ export const searchBookRequest = () => ({ type: SEARCH_BOOK_REQUEST });
 export const searchBookSuccess = () => ({ type: SEARCH_BOOK_SUCCESS });
 export const searchBookError = e => ({ type: SEARCH_BOOK_ERROR, payload: e });
 
+export const setSearchText = e => ({ type: SET_SEARCH_TEXT, payload: e });
+export const setSearchTopic = e => ({ type: SET_SEARCH_TOPIC, payload: e });
+
 export const setAllTopics = e => ({ type: SET_ALL_TOPICS, payload: e });
 
 export const setBooks = e => ({ type: SET_BOOKS, payload: e });
@@ -87,13 +102,13 @@ export const getTopics = () => async dispatch => {
     }
 };
 
-export const searchBooks = name => async dispatch => {
+export const searchBooks = () => async dispatch => {
     dispatch(searchBookRequest());
     try {
         const querySnapshot = await getDocs(collection(db, 'books'));
         const tempBooks = [];
         querySnapshot.forEach(doc => {
-            const book = { id: doc.id, ...doc.data() };
+            const book = {  ...doc.data() };
             tempBooks.push(book);
         });
         dispatch(setBooks(tempBooks));
@@ -110,8 +125,7 @@ export const getViewBook = id => async dispatch => {
         const docRef = doc(db, 'books', id);
         const viewBook = await getDoc(docRef);
         if (viewBook.exists()) {
-            dispatch(setViewBook(viewBook.data()));
-            console.log(viewBook.data());
+            dispatch(setViewBook({ ...viewBook.data() }));
         }
     } catch (e) {
         dispatch(getViewBookError(e));

@@ -6,8 +6,9 @@ import defaultBookCover from './../../assets/defaultBookImg/defaultBookCover.jpg
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { deleteBook, setBookForChange, setBookTopics } from '../../redux/createBookReducer';
+import { searchBooks } from '../../redux/searchBookReducer';
 
-const BookCard = ({ book, onSearchBooks, ...props }) => {
+const BookCard = ({ book, isAdminPage, ...props }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { deleteBookError } = useSelector(state => state.createBook);
@@ -22,7 +23,7 @@ const BookCard = ({ book, onSearchBooks, ...props }) => {
 
     const onDeleteBook = id => {
         dispatch(deleteBook(id));
-        if (deleteBookError == null) onSearchBooks();
+        if (deleteBookError == null) dispatch(searchBooks());
     };
 
     return (
@@ -40,26 +41,29 @@ const BookCard = ({ book, onSearchBooks, ...props }) => {
                 image={book.BookCover ? book.BookCover : defaultBookCover}
                 sx={{ objectFit: 'contain', backgroundColor: '#f1f1f1' }}
             />
-            <Box sx={{ position: 'absolute', left: '170px', display: 'flex', flexDirection: 'column' }}>
-                <IconButton
-                    color='primary'
-                    onClick={e => {
-                        e.stopPropagation();
-                        onChangeBook(book);
-                    }}
-                >
-                    <EditIcon />
-                </IconButton>
-                <IconButton
-                    color='error'
-                    onClick={e => {
-                        e.stopPropagation();
-                        onDeleteBook(book.id);
-                    }}
-                >
-                    <DeleteIcon />
-                </IconButton>
-            </Box>
+            {isAdminPage ? (
+                <Box sx={{ position: 'absolute', left: '170px', display: 'flex', flexDirection: 'column' }}>
+                    <IconButton
+                        color='primary'
+                        onClick={e => {
+                            e.stopPropagation();
+                            onChangeBook(book);
+                        }}
+                    >
+                        <EditIcon />
+                    </IconButton>
+                    <IconButton
+                        color='error'
+                        onClick={e => {
+                            e.stopPropagation();
+                            onDeleteBook(book.id);
+                        }}
+                    >
+                        <DeleteIcon />
+                    </IconButton>
+                </Box>
+            ) : null}
+
             <CardContent sx={{ py: 0.5 }}>
                 <Typography variant='body2'>{book.BookName.length > 46 ? book.BookName.slice(0, 46) + '...' : book.BookName}</Typography>
                 <Typography variant='caption'>

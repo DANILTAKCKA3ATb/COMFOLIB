@@ -25,19 +25,22 @@ import MenuBookIcon from '@mui/icons-material/MenuBook';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import FavoriteIcon from '@mui/icons-material/Favorite';
+import { addRemoveBookshelfBook, getBookshelfBooksId } from '../../redux/bookshelfReducer';
 
 const BookPage = props => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { isAuthenticated, isAdmin } = useSelector(state => state.auth);
     const { viewBook, getViewBookError, getViewBookInProgress } = useSelector(state => state.searchBook);
-
+    const { addBookshelfBookInProgress, addBookshelfBookError, bookshelfBooksId } = useSelector(state => state.bookshelf);
     const [isDescriptionOpen, setIsDescriptonOpen] = useState(false);
+    const [isAccordionOpen, setIsAccordionOpen] = useState(false);
 
     useEffect(() => {
-        if (!isAuthenticated) navigate('/login');
+        //if (!isAuthenticated) navigate('/login');
         const id = window.location.href.split('/')[4];
         dispatch(getViewBook(id));
+        dispatch(getBookshelfBooksId());
     }, []);
 
     // useEffect(() => {
@@ -54,27 +57,41 @@ const BookPage = props => {
                 minHeight: '610px',
             }}
         >
-            <Backdrop sx={{ color: '#fff', zIndex: theme => theme.zIndex.drawer + 1 }} open={getViewBookInProgress}>
+            <Backdrop sx={{ color: '#fff', zIndex: theme => theme.zIndex.drawer + 1 }} open={getViewBookInProgress || addBookshelfBookInProgress}>
                 <CircularProgress color='inherit' />
             </Backdrop>
 
             <Stack direction={'row'} gap={2}>
                 <Stack direction={'column'} gap={2}>
-                    <Box
+                    <Paper
+                        elevation={4}
                         component='img'
-                        sx={{ position: 'relative', height: '480px', width: '320px', objectFit: 'contain', backgroundColor: '#f1f1f1' }}
+                        sx={{
+                            height: '480px',
+                            width: '320px',
+                            objectFit: 'contain',
+                            backgroundColor: '#f1f1f1',
+                        }}
                         src={viewBook.BookCover}
                         alt='Book Cover'
-                    ></Box>
-                    <Box sx={{ position: 'absolute', left: '428px', display: 'flex', flexDirection: 'column' }}>
-                        <IconButton color='error' onClick={() => {}}>
-                            <FavoriteBorderIcon sx={{ fontSize: 60 }} />
-                        </IconButton>
-                    </Box>
-                    <Button variant='contained' color='secondary'>
-                        Add to bookshelf
-                        <TurnedInNotIcon sx={{ mx: 0.3 }} />
-                    </Button>
+                    ></Paper>
+                    <Stack direction={'row'} sx={{ display: 'flex', flexDirection: 'row' }}>
+                        <Button variant='contained' color='error'>
+                            Like
+                            <FavoriteBorderIcon sx={{ mx: 0.3 }} />
+                        </Button>
+                        <Button
+                            variant='contained'
+                            color='secondary'
+                            sx={{ ml: 'auto' }}
+                            onClick={() => {
+                                dispatch(addRemoveBookshelfBook(viewBook.id, bookshelfBooksId.includes(viewBook.id)));
+                            }}
+                        >
+                            Add to bookshelf
+                            {bookshelfBooksId.includes(viewBook.id) ? <TurnedInIcon sx={{ mx: 0.3 }} /> : <TurnedInNotIcon sx={{ mx: 0.3 }} />}
+                        </Button>
+                    </Stack>
                     <Button variant='contained'>
                         Read
                         <MenuBookIcon sx={{ mx: 0.5 }} />
@@ -105,12 +122,19 @@ const BookPage = props => {
                         variant='body2'
                         onClick={() => {
                             setIsDescriptonOpen(!isDescriptionOpen);
+                            setIsAccordionOpen(false);
                         }}
                     >
                         {isDescriptionOpen ? viewBook.Description : viewBook.Description.slice(0, 1000) + (viewBook.Description.length >= 1000 ? '...' : '')}
                     </Typography>
                     <Divider />
-                    <Accordion>
+                    <Accordion
+                        expanded={isAccordionOpen}
+                        onClick={() => {
+                            setIsAccordionOpen(!isAccordionOpen);
+                            setIsDescriptonOpen(false);
+                        }}
+                    >
                         <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls='panel1a-content' id='panel1a-header'>
                             <Typography variant='subtitle1'>Where can I find this book?</Typography>
                         </AccordionSummary>

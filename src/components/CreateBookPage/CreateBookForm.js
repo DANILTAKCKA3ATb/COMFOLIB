@@ -1,4 +1,4 @@
-import { Autocomplete, Backdrop, Button, CircularProgress, Container, Divider, Stack, TextField, Typography } from '@mui/material';
+import { Autocomplete, Backdrop, Button, CircularProgress, Container, Divider, Paper, Stack, TextField, Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import { useDispatch, useSelector } from 'react-redux';
 import React, { useEffect, useState } from 'react';
@@ -65,12 +65,12 @@ export const CreateBookForm = props => {
                         </Typography>
                         <Divider sx={{ my: 2 }} />
                         <Stack direction='row'>
-                            <Box
+                            <Paper
                                 component='img'
                                 sx={{ height: '450px', width: '300px', objectFit: 'contain' }}
                                 src={coverPreview ? coverPreview : !!bookForChange ? bookForChange.BookCover : defaultBookCover}
                                 alt='Book Cover'
-                            ></Box>
+                            ></Paper>
                             <Container>
                                 <Stack direction='column' gap={1}>
                                     <FieldTextInput required variant='outlined' type='text' id='BookName' label='Book Name' name='BookName' />
@@ -148,7 +148,7 @@ export const CreateBookForm = props => {
                                 </Typography>
                             ) : null}
                             <Button type='submit' size='large' variant='contained' color='success' sx={{ ml: 'auto' }}>
-                                Create Book
+                                {bookForChange ? 'Change book' : 'Create Book'}
                             </Button>
                         </Stack>
                     </form>

@@ -16,10 +16,14 @@ import ProfilePage from './components/ProfilePage/ProfilePage';
 import SignupPage from './components/SingupPage/SingupPage';
 import Header from './components/Header/Header';
 import MainPage from './components/MainPage/MainPage';
-import { useNavigate } from 'react-router-dom';
 import CreateBookPage from './components/CreateBookPage/CreateBookPage';
-import AdmBooksPage from './components/AdmBooksPage/AdmBooksPage';
+import BooksPage from './components/BooksPage/BooksPage';
 import BookPage from './components/BookPage/BookPage';
+import BookshelfPage from './components/BookshelfPage/BookshelfPage';
+import { setUserId } from './redux/userReducer';
+import LibrariesPage from './components/Libraries/LibrariesPage';
+import CreateLibraryPage from './components/CreateLibrariePage/CreateLibraryPage';
+import UsersPage from './components/UsersPage/UsersPage';
 
 const store = configureStore({}, app);
 window.store = store;
@@ -29,28 +33,33 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 onAuthStateChanged(auth, user => {
     store.dispatch(authInfoSuccess(user));
     if (store.getState().auth.isAuthenticated) {
+        store.dispatch(setUserId(user.uid));
         store.dispatch(getAdmin(user.uid));
     }
 
     root.render(
-        <React.StrictMode>
-            <Provider store={store}>
-                <BrowserRouter>
-                    <Header />
-                    <Routes>
-                        <Route path='/signup' element={<SignupPage />} />
-                        <Route path='/login' element={<LoginPage />} />
-                        <Route path='/profile' element={<ProfilePage />} />
-                        <Route path='/main' element={<MainPage />} />
-                        <Route path='/books' element={<AdmBooksPage />} />
-                        <Route path='/createBook' element={<CreateBookPage />} />
-                        <Route path='/bookpage/*' element={<BookPage />} />
-                        <Route path='' element={<Navigate to={'/main'} />} />
-                        <Route path='/' element={<NotFoundPage />} />
-                    </Routes>
-                </BrowserRouter>
-            </Provider>
-        </React.StrictMode>
+        <Provider store={store}>
+            <BrowserRouter>
+                <Header />
+                <Routes>
+                    <Route path='/signup' element={<SignupPage />} />
+                    <Route path='/login' element={<LoginPage />} />
+                    <Route path='/profile' element={<ProfilePage />} />
+                    <Route path='/main' element={<MainPage />} />
+                    <Route path='/search' element={<BooksPage isAdminPage={false} />} />
+                    <Route path='/books' element={<BooksPage isAdminPage={true} />} />
+                    <Route path='/createBook' element={<CreateBookPage />} />
+                    <Route path='/bookshelf' element={<BookshelfPage />} />
+                    <Route path='/bookpage/*' element={<BookPage />} />
+                    <Route path='/libraries' element={<LibrariesPage isAdminPage={false} />} />
+                    <Route path='/librariesAdm' element={<LibrariesPage isAdminPage={true} />} />
+                    <Route path='/createlibrary' element={<CreateLibraryPage />} />
+                    <Route path='/users' element={<UsersPage />} />
+                    <Route path='' element={<Navigate to={'/main'} />} />
+                    <Route path='/' element={<NotFoundPage />} />
+                </Routes>
+            </BrowserRouter>
+        </Provider>
     );
 });
 

@@ -14,23 +14,24 @@ import MenuBookIcon from '@mui/icons-material/MenuBook';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from './../../redux/authReducer';
 import { useNavigate } from 'react-router-dom';
+import { Backdrop, CircularProgress } from '@mui/material';
 
 const pages = [
     { name: 'Home', nav: '/main' },
     { name: 'Search', nav: '/search' },
     { name: 'Bookshelf', nav: '/bookshelf' },
     { name: 'Borrowed', nav: '/borrowed' },
+    { name: 'Libraries', nav: '/libraries' },
 ];
 const adminPages = [
     { name: 'Books', nav: '/books' },
-    { name: 'Libraries', nav: '/libraries' },
+    { name: 'Libraries Adm', nav: '/librariesAdm' },
     { name: 'Users', nav: '/users' },
 ];
 
 const Header = () => {
     const dispatch = useDispatch();
-    const { isAuthenticated } = useSelector(state => state.auth);
-    const { isAdmin } = useSelector(state => state.auth);
+    const { isAuthenticated, isAdmin, getIsAdminProgress, loginInProgress, signupInProgress, logoutInProgress } = useSelector(state => state.auth);
     const [anchorElUser, setAnchorElUser] = React.useState(null);
 
     const navigate = useNavigate();
@@ -48,105 +49,113 @@ const Header = () => {
     };
 
     return (
-        <AppBar position='static'>
-            <Container maxWidth='xl'>
-                <Toolbar disableGutters>
-                    <MenuBookIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
-                    <Button
-                        sx={{
-                            my: 0.7,
-                            mr: 1,
-                            width: '160px',
-                            color: 'white',
-                            display: 'block',
-                        }}
-                        onClick={() => {
-                            navigate('/main');
-                        }}
-                    >
-                        <Typography
-                            variant='h6'
-                            noWrap
+        <>
+            <Backdrop
+                sx={{ color: '#fff', zIndex: theme => theme.zIndex.drawer + 1 }}
+                open={getIsAdminProgress || loginInProgress || signupInProgress || logoutInProgress}
+            >
+                <CircularProgress color='inherit' />
+            </Backdrop>
+            <AppBar position='static'>
+                <Container maxWidth='xl'>
+                    <Toolbar disableGutters>
+                        <MenuBookIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+                        <Button
                             sx={{
-                                fontFamily: 'monospace',
-                                fontWeight: 700,
-                                letterSpacing: '.3rem',
-                                color: 'inherit',
-                                textDecoration: 'none',
+                                my: 0.7,
+                                mr: 1,
+                                width: '160px',
+                                color: 'white',
+                                display: 'block',
+                            }}
+                            onClick={() => {
+                                navigate('/main');
                             }}
                         >
-                            COMFOLIB
-                        </Typography>
-                    </Button>
-                    {isAuthenticated ? (
-                        <>
-                            <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-                                {pages.map(page => (
-                                    <Button
-                                        key={page.name}
-                                        sx={{ my: 2, mr: 1, color: 'white', display: 'block' }}
-                                        onClick={() => {
-                                            navigate(page.nav);
+                            <Typography
+                                variant='h6'
+                                noWrap
+                                sx={{
+                                    fontFamily: 'monospace',
+                                    fontWeight: 700,
+                                    letterSpacing: '.3rem',
+                                    color: 'inherit',
+                                    textDecoration: 'none',
+                                }}
+                            >
+                                COMFOLIB
+                            </Typography>
+                        </Button>
+                        {isAuthenticated ? (
+                            <>
+                                <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+                                    {pages.map(page => (
+                                        <Button
+                                            key={page.name}
+                                            sx={{ my: 2, mr: 1, color: 'white', display: 'block' }}
+                                            onClick={() => {
+                                                navigate(page.nav);
+                                            }}
+                                        >
+                                            {page.name}
+                                        </Button>
+                                    ))}
+                                    {isAdmin
+                                        ? adminPages.map(page => (
+                                              <Button
+                                                  key={page.name}
+                                                  variant='contained'
+                                                  color='secondary'
+                                                  sx={{ my: 2, mr: 1, color: 'white', display: 'block' }}
+                                                  onClick={() => {
+                                                      navigate(page.nav);
+                                                  }}
+                                              >
+                                                  {page.name}
+                                              </Button>
+                                          ))
+                                        : null}
+                                </Box>
+                                <Box sx={{ flexGrow: 0 }}>
+                                    <Tooltip title='Open settings'>
+                                        <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                                            <Avatar />
+                                        </IconButton>
+                                    </Tooltip>
+                                    <Menu
+                                        sx={{ mt: '45px' }}
+                                        id='menu-appbar'
+                                        anchorEl={anchorElUser}
+                                        anchorOrigin={{
+                                            vertical: 'top',
+                                            horizontal: 'right',
                                         }}
+                                        keepMounted
+                                        transformOrigin={{
+                                            vertical: 'top',
+                                            horizontal: 'right',
+                                        }}
+                                        open={Boolean(anchorElUser)}
+                                        onClose={handleCloseUserMenu}
                                     >
-                                        {page.name}
-                                    </Button>
-                                ))}
-                                {isAdmin
-                                    ? adminPages.map(page => (
-                                          <Button
-                                              key={page.name}
-                                              variant='contained'
-                                              color='secondary'
-                                              sx={{ my: 2, mr: 1, color: 'white', display: 'block' }}
-                                              onClick={() => {
-                                                  navigate(page.nav);
-                                              }}
-                                          >
-                                              {page.name}
-                                          </Button>
-                                      ))
-                                    : null}
-                            </Box>
-                            <Box sx={{ flexGrow: 0 }}>
-                                <Tooltip title='Open settings'>
-                                    <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                        <Avatar />
-                                    </IconButton>
-                                </Tooltip>
-                                <Menu
-                                    sx={{ mt: '45px' }}
-                                    id='menu-appbar'
-                                    anchorEl={anchorElUser}
-                                    anchorOrigin={{
-                                        vertical: 'top',
-                                        horizontal: 'right',
-                                    }}
-                                    keepMounted
-                                    transformOrigin={{
-                                        vertical: 'top',
-                                        horizontal: 'right',
-                                    }}
-                                    open={Boolean(anchorElUser)}
-                                    onClose={handleCloseUserMenu}
-                                >
-                                    <MenuItem key={'account'}>
-                                        <Typography textAlign='center' component='a' href='/profile'>
-                                            Account
-                                        </Typography>
-                                    </MenuItem>
-                                    <MenuItem key={'logout'} onClick={() => handleLogout()}>
-                                        <Typography textAlign='center' component='a' href='/login'>
-                                            Logout
-                                        </Typography>
-                                    </MenuItem>
-                                </Menu>
-                            </Box>
-                        </>
-                    ) : null}
-                </Toolbar>
-            </Container>
-        </AppBar>
+                                        <MenuItem key={'account'}>
+                                            <Typography textAlign='center' component='a' href='/profile'>
+                                                Account
+                                            </Typography>
+                                        </MenuItem>
+                                        <MenuItem key={'logout'} onClick={() => handleLogout()}>
+                                            <Typography textAlign='center' component='a' href='/login'>
+                                                Logout
+                                            </Typography>
+                                        </MenuItem>
+                                    </Menu>
+                                </Box>
+                            </>
+                        ) : null}
+                    </Toolbar>
+                </Container>
+            </AppBar>
+        </>
     );
 };
 
