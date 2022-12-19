@@ -1,5 +1,4 @@
 import { collection, deleteDoc, doc, getDocs, setDoc } from 'firebase/firestore';
-import { useSelector } from 'react-redux';
 import { auth, db } from '../firebase-config';
 
 export const SHOW_CURRENT_USER_REQUEST = 'app/user/SHOW_CURRENT_USER_REQUEST';

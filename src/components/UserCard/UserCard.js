@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { Avatar, Box, Card, CardContent, IconButton, Typography } from '@mui/material';
 import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp';
 import { Container, Stack } from '@mui/system';
@@ -14,7 +14,6 @@ const UserCard = ({
   ...props
 }) => {
   const dispatch = useDispatch();
-  const {} = useSelector(state => state.user);
 
   const [cardColor, setCardColor] = useState(null);
 
