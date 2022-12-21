@@ -23,7 +23,6 @@ const CreateLibraryPage = props => {
       id: '',
       LibraryName: values.LibraryName,
       Address: values.Address,
-      CreatedAt: null,
     };
     console.log(library);
     try {

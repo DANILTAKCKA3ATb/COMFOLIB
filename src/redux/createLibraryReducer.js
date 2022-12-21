@@ -64,7 +64,6 @@ export const createLibrary =
     dispatch(createLibraryRequest());
     if (id === 0) id = uuidv4();
     library.id = id;
-    library.CreatedAt = serverTimestamp();
     try {
       await setDoc(doc(db, 'libraries', id), library);
     } catch (e) {

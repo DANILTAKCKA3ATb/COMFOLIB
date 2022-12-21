@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { logout } from './../../redux/authReducer';
 import { useNavigate } from 'react-router-dom';
 import { Backdrop, CircularProgress } from '@mui/material';
+import './googleTranslate.css';
 
 const pages = [
   { name: 'Home', nav: '/main' },
@@ -25,7 +26,7 @@ const pages = [
 ];
 const adminPages = [
   { name: 'Books', nav: '/books' },
-  { name: 'Libraries Adm', nav: '/librariesAdm' },
+  { name: 'Libraries', nav: '/librariesAdm' },
   { name: 'Users', nav: '/users' },
 ];
 const thisLibraryPages = [
@@ -60,8 +61,30 @@ const Header = () => {
     dispatch(logout());
   };
 
+  const googleTranslateElementInit = () => {
+    new window.google.translate.TranslateElement(
+      {
+        pageLanguage: 'en',
+        autoDisplay: false,
+        includedLanguages: 'en,uk,fr,de,it,pt,es',
+      },
+      'google_translate_element'
+    );
+  };
+
+  useEffect(() => {
+    var addScript = document.createElement('script');
+    addScript.setAttribute(
+      'src',
+      '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit'
+    );
+    document.body.appendChild(addScript);
+    window.googleTranslateElementInit = googleTranslateElementInit;
+  }, []);
+
   return (
     <>
+      <Box id='google_translate_element' />
       <Backdrop
         sx={{ color: '#fff', zIndex: theme => theme.zIndex.drawer + 1 }}
         open={getIsAdminProgress || loginInProgress || signupInProgress || logoutInProgress}
@@ -71,11 +94,11 @@ const Header = () => {
       <AppBar position='static'>
         <Container maxWidth='xl'>
           <Toolbar disableGutters>
-            <MenuBookIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
+            <MenuBookIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 0.4 }} />
             <Button
               sx={{
-                my: 0.7,
-                mr: 1,
+                my: 0.4,
+                mr: 0.4,
                 width: '160px',
                 color: 'white',
                 display: 'block',
@@ -89,8 +112,8 @@ const Header = () => {
                 noWrap
                 sx={{
                   fontFamily: 'monospace',
-                  fontWeight: 700,
-                  letterSpacing: '.3rem',
+                  fontWeight: 600,
+                  letterSpacing: '.2rem',
                   color: 'inherit',
                   textDecoration: 'none',
                 }}
@@ -98,7 +121,6 @@ const Header = () => {
                 COMFOLIB
               </Typography>
             </Button>
-
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
               {pages.map(page => (
                 <Button
@@ -144,7 +166,6 @@ const Header = () => {
                   })
                 : null}
             </Box>
-
             <Box sx={{ flexGrow: 0 }}>
               <Tooltip title='Open settings'>
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>

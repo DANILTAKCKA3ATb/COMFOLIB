@@ -3,6 +3,7 @@ import { deleteObject, getDownloadURL, ref, uploadBytesResumable } from 'firebas
 import { db, storage } from '../firebase-config';
 import { v4 as uuidv4 } from 'uuid';
 import { serverTimestamp } from 'firebase/firestore';
+import { searchBooks } from './searchBookReducer';
 
 const CREATE_BOOK_REQUEST = 'app/createBook/CREATE_BOOK_REQUEST';
 const CREATE_BOOK_SUCCESS = 'app/createBook/CREATE_BOOK_SUCCESS';
@@ -107,7 +108,7 @@ export const createBook =
       throw e;
     }
     dispatch(setBookTopics([]));
-
+    dispatch(searchBooks());
     dispatch(createBookSuccess());
   };
 
